@@ -38,7 +38,7 @@ namespace WindbgEx
                 {
                     arch = ARCH.WOW64;
                 }
-                else if (vertarget.Contains(".amd64"))
+                else if (vertarget.Contains("Free x64"))
                 {
                     arch = ARCH.AMD64;
                 }
