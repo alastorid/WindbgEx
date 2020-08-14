@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,23 +9,23 @@ using System.Threading.Tasks;
 
 namespace WindbgEx
 {
-    enum ARCH
-    {
-        AMD64,
-        WOW64,
-        X86
-    };
     class WindbgEx
     {
+        enum ARCH
+        {
+            AMD64,
+            WOW64,
+            X86
+        };
         static void windbg(string dumpfile)
         {
-            Console.Write($"Loading {dumpfile}...");
+            Console.Write(string.Format("Loading {0}...", dumpfile));
             using (var dbg = new dbgeng())
             {
                 var result = dbg.OpenDumpFile(dumpfile);
                 if (null != result)
                 {
-                    Console.WriteLine($"{result}");
+                    Console.WriteLine(string.Format("{0}", result));
                     return;
                 }
 
@@ -38,7 +38,7 @@ namespace WindbgEx
                 {
                     arch = ARCH.WOW64;
                 }
-                else if(vertarget.Contains(".amd64"))
+                else if (vertarget.Contains(".amd64"))
                 {
                     arch = ARCH.AMD64;
                 }
@@ -46,7 +46,7 @@ namespace WindbgEx
                 {
                     arch = ARCH.X86;
                 }
-                
+
                 if (arch == ARCH.WOW64)
                 {
                     Console.WriteLine(dbg.Execute(@"!wow64exts.sw;"));
@@ -56,7 +56,7 @@ namespace WindbgEx
 
                 // prompt
                 var line = "=w=";
-                while (false == line?.StartsWith("q"))
+                while (line != null && !line.StartsWith("q"))
                 {
                     var mre = new ManualResetEvent(false);
                     var mreii = new ManualResetEvent(false);
@@ -84,9 +84,9 @@ namespace WindbgEx
                             }
                         }
                         Console.Write("\r      \r");
+                        var s = string.Empty;
                         while (false == mre.WaitOne(17))
                         {
-                            var s = string.Empty;
                             lock (sb)
                             {
                                 s = sb.ToString();
@@ -94,6 +94,12 @@ namespace WindbgEx
                             }
                             Console.Write(s);
                         }
+                        lock (sb)
+                        {
+                            s = sb.ToString();
+                            sb.Clear();
+                        }
+                        Console.Write(s);
                     })
                     { IsBackground = true };
                     tt.Start();
@@ -109,7 +115,7 @@ namespace WindbgEx
                     mreii.Set();
                     mre.Set();
                     tt.Join();
-                    Console.WriteLine($"{result}");
+                    Console.WriteLine(string.Format("{0}", result));
                 }
                 //===================================
             }
