@@ -88,3 +88,6 @@ PEB at 000000f597f45000
 ......
 ````
 have fun!
+
+
+credit goes to https://github.com/microsoft/clrmd
