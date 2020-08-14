@@ -51,26 +51,30 @@ namespace WindbgEx
                 {
                     Console.WriteLine(dbg.Execute(@"!wow64exts.sw;"));
                 }
-                //===================================
-                
+                //===== add your super hacky script here ======
+                //Console.WriteLine(dbg.Execute("vertarget"));
+
+                // prompt
                 var line = "=w=";
                 while (false == line?.StartsWith("q"))
                 {
                     var mre = new ManualResetEvent(false);
+                    var mreii = new ManualResetEvent(false);
                     Console.Write("> ");
                     line = Console.ReadLine();
-                    
+
+                    var sb = new StringBuilder();
                     var tt = new Thread(() =>
                     {
+                        var i = 0;
                         var bb = new[]
                         {
                             "\r-BUSY-",
                             "\r/BUSY/",
-                            "\r-BUSY-",
+                            "\r|BUSY|",
                             "\r\\BUSY\\",
                         };
-                        var i = 0;
-                        while (false == mre.WaitOne(333))
+                        while (false == mreii.WaitOne(33))
                         {
                             Console.Write(bb[i]);
                             i++;
@@ -80,16 +84,31 @@ namespace WindbgEx
                             }
                         }
                         Console.Write("\r      \r");
-                    }) { IsBackground = true};
+                        while (false == mre.WaitOne(17))
+                        {
+                            var s = string.Empty;
+                            lock (sb)
+                            {
+                                s = sb.ToString();
+                                sb.Clear();
+                            }
+                            Console.Write(s);
+                        }
+                    })
+                    { IsBackground = true };
                     tt.Start();
                     result = dbg.Execute(line, (m, t) =>
                     {
-                        mre.Set();
-                        tt.Join();
-                        Console.Write(t);
+                        mreii.Set();
+                        lock (sb)
+                        {
+                            sb.Append(t);
+                        }
                         return 0;
                     });
-                    
+                    mreii.Set();
+                    mre.Set();
+                    tt.Join();
                     Console.WriteLine($"{result}");
                 }
                 //===================================
