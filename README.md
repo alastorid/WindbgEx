@@ -5,7 +5,7 @@ Copy dlls from windbg folder or just put the compiled binary inside windbg folde
 ````
 windbgex [dump_file_path]
 ````
-# to compile
+# to compile without visual studio
 ````
 C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe dbgeng.cs WindbgEx.cs
 ````
