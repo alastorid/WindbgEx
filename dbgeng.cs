@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -68,9 +68,12 @@ namespace WindbgEx
         public const int E_NOTIMPL = unchecked((int) 0x80004001);
         public const int E_NOINTERFACE = unchecked((int) 0x80004002);
 
-        public bool IsOK => Value == S_OK;
+        public bool IsOK
+        {
+            get { return Value == S_OK; }
+        }
 
-        public int Value { get; set; }
+        public int Value;
 
         public HResult(int hr)
         {
@@ -102,7 +105,7 @@ namespace WindbgEx
                 case E_INVALIDARG: return "E_INVALIDARG";
                 case E_NOTIMPL: return "E_NOTIMPL";
                 case E_NOINTERFACE: return "E_NOINTERFACE";
-                default: return $"{Value:x8}";
+                default: return string.Format("{0:x8}", Value);
             }
         }
     }
@@ -555,7 +558,7 @@ namespace WindbgEx
             var guid = new Guid("27fe5639-8407-4f47-8364-ee118fb08ac8");
             HResult hr = DebugCreate(guid, out pDebugClient);
             if (!hr.IsOK)
-                throw new Exception($"Failed to create DebugClient, hr={hr:x}.");
+                throw new Exception(string.Format("Failed to create DebugClient, hr={0:x}.", hr));
 
             client = (IDebugClient) Marshal.GetTypedObjectForIUnknown(pDebugClient, typeof(IDebugClient));
             control = (IDebugControl) Marshal.GetTypedObjectForIUnknown(pDebugClient, typeof(IDebugControl));
@@ -574,11 +577,11 @@ namespace WindbgEx
             HResult hr;
             hr = client.OpenDumpFile(DumpFile);
             if (!hr.IsOK)
-                return $"Failed to OpenDumpFile, hr={hr:x}.";
+                return string.Format("Failed to OpenDumpFile, hr={0:x}.", hr);
 
             hr = control.WaitForEvent(DEBUG_WAIT.DEFAULT, 60000);
             if (!hr.IsOK)
-                return $"Failed to attach to dump file, hr={hr:x}.";
+                return string.Format("Failed to attach to dump file, hr={0:x}.", hr);
             return null;
         }
 
@@ -603,12 +606,12 @@ namespace WindbgEx
                 hr = client.SetOutputCallbacks(new DebugOutputCallbacks(callback));
                 if (!hr.IsOK)
                 {
-                    sb.AppendLine($"SetOutputCallbacks failed. HRESULT={hr:x}.");
+                    sb.AppendLine(string.Format("SetOutputCallbacks failed. HRESULT={0:x}.", hr));
                 }
                 else
                 {
                     hr = control.Execute(DEBUG_OUTCTL.THIS_CLIENT, cmd, DEBUG_EXECUTE.DEFAULT);
-                    if (!hr.IsOK) sb.AppendLine($"Command encountered an error. HRESULT={hr:x}.");
+                    if (!hr.IsOK) sb.AppendLine(string.Format("Command encountered an error. HRESULT={0:x}.", hr));
                 }
 
                 if (origCallback != null)
